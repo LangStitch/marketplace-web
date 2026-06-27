@@ -11,7 +11,7 @@ name: Build & Deploy Marketplace
 #   FTP_USERNAME       FTP username
 #   FTP_PASSWORD       FTP password
 # Repository variables:
-#   PLATFORM_API_BASE  API base the SPA calls (e.g. https://api.langstitch.com)
+#   PLATFORM_API_BASE  API host the SPA calls (e.g. https://api.langstitch.com — /api is appended automatically)
 #   FTP_SERVER_DIR     marketplace docroot (e.g. public_html/ for the subdomain)
 
 on:
