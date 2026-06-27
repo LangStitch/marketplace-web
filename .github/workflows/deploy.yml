@@ -1,0 +1,56 @@
+name: Build & Deploy Marketplace
+
+# Builds the LangStitch marketplace SPA from the canvas source (which lives in
+# the private LangStitch/langtailor repo, under _canvas/) and deploys the static
+# build to Hostinger (marketplace.langstitch.com). The SPA host-routes to the
+# marketplace view at runtime (host === marketplace.langstitch.com).
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   CANVAS_REPO_TOKEN  PAT with read access to LangStitch/langtailor (private)
+#   FTP_SERVER         Hostinger FTP host
+#   FTP_USERNAME       FTP username
+#   FTP_PASSWORD       FTP password
+# Repository variables:
+#   PLATFORM_API_BASE  API base the SPA calls (e.g. https://api.langstitch.com)
+#   FTP_SERVER_DIR     marketplace docroot (e.g. public_html/ for the subdomain)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout marketplace-web
+        uses: actions/checkout@v4
+
+      - name: Checkout canvas source (private langtailor)
+        uses: actions/checkout@v4
+        with:
+          repository: LangStitch/langtailor
+          token: ${{ secrets.CANVAS_REPO_TOKEN }}
+          path: langtailor
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build SPA
+        working-directory: langtailor/_canvas
+        env:
+          VITE_PLATFORM_API: ${{ vars.PLATFORM_API_BASE || 'https://api.langstitch.com' }}
+        run: |
+          npm install
+          npx vite build
+
+      - name: Deploy to Hostinger via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./langtailor/_canvas/dist/
+          server-dir: ${{ vars.FTP_SERVER_DIR || 'public_html/' }}
