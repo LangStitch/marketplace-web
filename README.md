@@ -25,7 +25,7 @@ Secrets:
 | Secret | Purpose |
 |--------|---------|
 | `CANVAS_REPO_TOKEN` | PAT with read access to `LangStitch/langtailor` |
-| `FTP_SERVER` | `ftp.langstitch.com` (or FTP IP from hPanel) |
+| `FTP_SERVER` | `ftpupload.net` (Hostinger FTP host) |
 | `FTP_USERNAME` | `u743467360.marketplacedeveloper` |
 | `FTP_PASSWORD` | FTP password for that account |
 
