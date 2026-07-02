@@ -22,6 +22,9 @@ GitHub Pages is not used for this SPA — Hostinger serves `marketplace.langstit
 
 Secrets:
 
+> The marketplace SPA (`marketplace-web`) calls this API. MySQL credentials
+> live in `langstitch-backend-service` secrets — not in `marketplace-web`.
+
 | Secret | Purpose |
 |--------|---------|
 | `CANVAS_REPO_TOKEN` | PAT with read access to `LangStitch/langtailor` |
