@@ -25,14 +25,15 @@ Secrets:
 | Secret | Purpose |
 |--------|---------|
 | `CANVAS_REPO_TOKEN` | PAT with read access to `LangStitch/langtailor` |
-| `FTP_SERVER` / `FTP_USERNAME` / `FTP_PASSWORD` | Hostinger FTP (same account as `langstitch-site`) |
+| `FTP_SERVER` | `ftp.langstitch.com` (or FTP IP from hPanel) |
+| `FTP_USERNAME` | `u743467360.marketplacedeveloper` |
+| `FTP_PASSWORD` | FTP password for that account |
 
 Variables:
 
 | Variable | Default |
 |----------|---------|
 | `PLATFORM_API_BASE` | `https://api.langstitch.com` |
-| `FTP_SERVER_DIR` | `domains/marketplace.langstitch.com/public_html/` |
 
 > The backend API must be live at `PLATFORM_API_BASE` with
 > `LANGSTITCH_AUTH_ENABLED=true` + MySQL, and its `LANGSTITCH_CORS_ORIGINS`

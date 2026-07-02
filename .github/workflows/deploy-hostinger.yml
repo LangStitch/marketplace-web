@@ -1,16 +1,16 @@
 name: Deploy to Hostinger
 
-# Builds the marketplace SPA from LangStitch/langtailor (_canvas/) and deploys
-# to marketplace.langstitch.com on Hostinger over FTPS.
+# Builds the marketplace SPA and deploys to marketplace.langstitch.com.
+# FTP account is scoped to public_html/marketplace (deploy to ./).
 #
-# Required repository secrets:
-#   CANVAS_REPO_TOKEN  PAT with read access to LangStitch/langtailor (private)
-#   FTP_SERVER         Hostinger FTP IP from hPanel Plan Details
-#   FTP_USERNAME       FTP account username
+# Required secrets:
+#   CANVAS_REPO_TOKEN  PAT with read access to LangStitch/langtailor
+#   FTP_SERVER         ftp.langstitch.com (or FTP IP from hPanel)
+#   FTP_USERNAME       u743467360.marketplacedeveloper
 #   FTP_PASSWORD       FTP account password
-# Optional repository variables:
-#   PLATFORM_API_BASE  API host the SPA calls (default: https://api.langstitch.com)
-#   FTP_SERVER_DIR     marketplace docroot (default: domains/marketplace.langstitch.com/public_html/)
+# Optional variables:
+#   PLATFORM_API_BASE  default https://api.langstitch.com
+#   FTP_SERVER_DIR     default ./
 
 on:
   push:
@@ -73,7 +73,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           local-dir: ./langtailor/_canvas/dist/
-          server-dir: ${{ vars.FTP_SERVER_DIR || 'domains/marketplace.langstitch.com/public_html/' }}
+          server-dir: ${{ vars.FTP_SERVER_DIR || './' }}
           exclude: |
             **/.git*
             **/.git*/**
