@@ -10,11 +10,13 @@ host at runtime and renders the standalone marketplace when served from
 
 ## How it works
 
-`.github/workflows/deploy.yml` on every push to `main` (or manual run):
+`.github/workflows/deploy-hostinger.yml` on every push to `main` (or manual run):
 
 1. Checks out the private `langtailor` repo (needs `CANVAS_REPO_TOKEN`).
 2. Builds `_canvas` with `VITE_PLATFORM_API` pointing at the backend API.
 3. FTPS-deploys `_canvas/dist/` to the marketplace docroot on Hostinger.
+
+GitHub Pages is not used for this SPA — Hostinger serves `marketplace.langstitch.com`.
 
 ## Required configuration
 
@@ -23,14 +25,14 @@ Secrets:
 | Secret | Purpose |
 |--------|---------|
 | `CANVAS_REPO_TOKEN` | PAT with read access to `LangStitch/langtailor` |
-| `FTP_SERVER` / `FTP_USERNAME` / `FTP_PASSWORD` | Hostinger FTP |
+| `FTP_SERVER` / `FTP_USERNAME` / `FTP_PASSWORD` | Hostinger FTP (same account as `langstitch-site`) |
 
 Variables:
 
-| Variable | Example |
+| Variable | Default |
 |----------|---------|
 | `PLATFORM_API_BASE` | `https://api.langstitch.com` |
-| `FTP_SERVER_DIR` | the marketplace subdomain docroot (e.g. `public_html/`) |
+| `FTP_SERVER_DIR` | `domains/marketplace.langstitch.com/public_html/` |
 
 > The backend API must be live at `PLATFORM_API_BASE` with
 > `LANGSTITCH_AUTH_ENABLED=true` + MySQL, and its `LANGSTITCH_CORS_ORIGINS`

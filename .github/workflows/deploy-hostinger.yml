@@ -1,0 +1,81 @@
+name: Deploy to Hostinger
+
+# Builds the marketplace SPA from LangStitch/langtailor (_canvas/) and deploys
+# to marketplace.langstitch.com on Hostinger over FTPS.
+#
+# Required repository secrets:
+#   CANVAS_REPO_TOKEN  PAT with read access to LangStitch/langtailor (private)
+#   FTP_SERVER         Hostinger FTP IP from hPanel Plan Details
+#   FTP_USERNAME       FTP account username
+#   FTP_PASSWORD       FTP account password
+# Optional repository variables:
+#   PLATFORM_API_BASE  API host the SPA calls (default: https://api.langstitch.com)
+#   FTP_SERVER_DIR     marketplace docroot (default: domains/marketplace.langstitch.com/public_html/)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check deploy configuration
+        id: cfg
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          CANVAS_REPO_TOKEN: ${{ secrets.CANVAS_REPO_TOKEN }}
+        run: |
+          missing=""
+          [ -z "$FTP_SERVER" ] && missing="$missing FTP_SERVER"
+          [ -z "$CANVAS_REPO_TOKEN" ] && missing="$missing CANVAS_REPO_TOKEN"
+          if [ -n "$missing" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping Hostinger deploy — missing secrets:$missing"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout marketplace-web
+        if: steps.cfg.outputs.configured == 'true'
+        uses: actions/checkout@v7
+
+      - name: Checkout canvas source (private langtailor)
+        if: steps.cfg.outputs.configured == 'true'
+        uses: actions/checkout@v7
+        with:
+          repository: LangStitch/langtailor
+          token: ${{ secrets.CANVAS_REPO_TOKEN }}
+          path: langtailor
+
+      - name: Setup Node
+        if: steps.cfg.outputs.configured == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build SPA
+        if: steps.cfg.outputs.configured == 'true'
+        working-directory: langtailor/_canvas
+        env:
+          VITE_PLATFORM_API: ${{ vars.PLATFORM_API_BASE || 'https://api.langstitch.com' }}
+        run: |
+          npm install
+          npx vite build
+
+      - name: Deploy to Hostinger via FTPS
+        if: steps.cfg.outputs.configured == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./langtailor/_canvas/dist/
+          server-dir: ${{ vars.FTP_SERVER_DIR || 'domains/marketplace.langstitch.com/public_html/' }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            README.md
